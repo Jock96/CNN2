@@ -1,6 +1,10 @@
 ﻿namespace Core.Models
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
+
+    using Extensions;
 
     /// <summary>
     /// Карта изображения.
@@ -26,6 +30,40 @@
         {
             Size = size;
             CreateCells(data);
+        }
+
+        /// <summary>
+        /// Преобразовать в список нейронов.
+        /// </summary>
+        /// <returns>Возвращает список нейронов.</returns>
+        public List<Neuron> ToNeuronList()
+        {
+            var neurons = new List<Neuron>();
+            int countOnLayer;
+
+            if (Cells.Count.Equals(1))
+                countOnLayer = 1;
+            else
+                countOnLayer = Cells.Count / 2;
+
+            for (var index = 0; index < countOnLayer; ++index)
+            {
+                var inputs = Cells.Select(cell => cell.Value).ToList();
+
+                var lastWeights = new List<double>();
+                var weights = new List<double>();
+
+                for (var w = 0; w < Cells.Count; ++w)
+                {
+                    lastWeights.Add(0);
+                    var value = new Random().NextDouble(0.0001, 0.2);
+                    weights.Add(value);
+                }
+
+                neurons.Add(new Neuron(inputs, weights) { LastWeights = lastWeights });
+            }
+
+            return neurons;
         }
 
         /// <summary>

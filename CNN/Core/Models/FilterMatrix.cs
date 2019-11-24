@@ -57,6 +57,7 @@
                     for (var y = 0; y < Size; ++y)
                     {
                         var value = new Random().NextDouble(0.00001, 0.2);
+                        System.Threading.Thread.Sleep(20);
                         Cells.Add(new ModifiedCell(x, y, value));
                     }
             }

@@ -85,8 +85,7 @@
                     return figureMap;
 
                 case LayerReturnType.Neurons:
-                    // TODO: Реализовать возврат нейронов.
-                    throw new NotImplementedException();
+                    return figureMap.ToNeuronList();
 
                 default:
                     throw new Exception("Неизвестный тип возвращаемого значения!");

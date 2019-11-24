@@ -61,6 +61,9 @@
         /// <param name="neurons">Нейроны.</param>
         public void SetData(List<Neuron> neurons)
         {
+            if (!_isInitialized)
+                throw new Exception("Перед внесением данных в слой необходимо его проинициализировать!");
+
             if (!neurons.Count.Equals(_layerNeurons.Count))
                 throw new Exception("Количество переданных нейронов не соттвествует количеству нейроно на слое!");
 
@@ -72,6 +75,9 @@
         /// </summary>
         public override dynamic GetData(LayerReturnType returnType)
         {
+            if (!_isInitialized)
+                throw new Exception("Слой не инициализирован и не может вернуть значения!");
+
             // Независимо от типа возвращаем словарь нейронов
             // Ключ - номер нейрона, значение - сам нейрон.
 

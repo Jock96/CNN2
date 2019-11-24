@@ -12,7 +12,7 @@
         /// <summary>
         /// Тип слоя.
         /// </summary>
-        public override LayerType Type { get; } = LayerType.Input;
+        public override LayerType Type => LayerType.Input;
 
         /// <summary>
         /// Данные.
@@ -118,13 +118,25 @@
         /// <summary>
         /// Получить данные слоя.
         /// </summary>
+        /// <param name="returnType">Какой тип необходимо вернуть.</param>
         /// <returns>Возвращает данные слоя.</returns>
-        public FigureMap GetData()
+        public override dynamic GetData(LayerReturnType returnType)
         {
             if (!_isInitialized)
                 throw new Exception("Слой не инициализирован и не может вернуть значения!");
 
-            return _layerData;
+            switch (returnType)
+            {
+                case LayerReturnType.Map:
+                    return _layerData;
+
+                case LayerReturnType.Neurons:
+                    // TODO: Реализовать возврат нейронов.
+                    throw new NotImplementedException();
+
+                default:
+                    throw new Exception("Неизвестный тип возвращаемого значения!");
+            }
         }
     }
 }

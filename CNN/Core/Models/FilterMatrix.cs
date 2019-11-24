@@ -93,6 +93,9 @@
         /// <returns>Новая карта изображений.</returns>
         public FigureMap DoMapFiltering(FigureMap map)
         {
+            if (!_isInitialized)
+                throw new Exception("Невозможно использовать фильтр до его инициализации!");
+
             var step = map.Size - this.Size;
             var newSize = step + 1;
             double[,] data = new double[newSize, newSize];

@@ -1,34 +1,28 @@
 ﻿namespace Core.Models.Layers
 {
     using System;
-    using System.Collections.Generic;
 
     using Core.Enums;
 
     /// <summary>
-    /// Свёрточный слой.
+    /// Слой пуллинга.
     /// </summary>
-    public class ConvolutionLayer : Layer
+    public class SubsamplingLayer : Layer
     {
         /// <summary>
         /// Тип слоя.
         /// </summary>
-        public override LayerType Type => LayerType.Convolution;
+        public override LayerType Type => LayerType.Subsampling;
 
         /// <summary>
-        /// Размерность матрицы фильтра.
-        /// </summary>
-        private int _filterMatrixSize;
-
-        /// <summary>
-        /// Карта значений.
+        /// Карта изображения.
         /// </summary>
         private FigureMap _map;
 
         /// <summary>
-        /// Матрица фильтра.
+        /// Размер матрицы макс-пуллинга.
         /// </summary>
-        private FilterMatrix _filterMatrix;
+        private int _poolingMatrixSize;
 
         /// <summary>
         /// Слой инициализирован?
@@ -36,14 +30,19 @@
         private bool _isInitialized;
 
         /// <summary>
-        /// Свёрточный слой.
+        /// Матрица макс-пуллинга.
         /// </summary>
-        /// <param name="map">Карта значений.</param>
-        /// <param name="filterMatrixSize">Размерность матрицы фильтра.</param>
-        public ConvolutionLayer(FigureMap map, int filterMatrixSize)
+        private PoolingMatrix _poolingMatrix;
+
+        /// <summary>
+        /// Слой пуллинга.
+        /// </summary>
+        /// <param name="map">Карта изображения.</param>
+        /// <param name="poolingMatrixSize">Размер матрицы макс-пуллинга.</param>
+        public SubsamplingLayer(FigureMap map, int poolingMatrixSize)
         {
             _map = map;
-            _filterMatrixSize = filterMatrixSize;
+            _poolingMatrixSize = poolingMatrixSize;
         }
 
         /// <summary>
@@ -57,7 +56,7 @@
 
             if (type.Equals(NetworkModeType.Learning))
             {
-                _filterMatrix = new FilterMatrix(_filterMatrixSize, type);
+                _poolingMatrix = new PoolingMatrix(_poolingMatrixSize);
             }
             else
             {
@@ -71,17 +70,19 @@
         /// <summary>
         /// Получить данные слоя.
         /// </summary>
-        /// <param name="returnType">Тип возвращаемого значения.</param>
-        /// <returns>Возвращает данные слоя.</returns>
+        /// <param name="returnType">Тип возвращаемых значений.</param>
+        /// <returns>Возвращаемые значения.</returns>
         public override dynamic GetData(LayerReturnType returnType)
         {
             if (!_isInitialized)
                 throw new Exception("Слой не инициализирован и не может вернуть значения!");
 
+            var figureMap = _poolingMatrix.DoMaxPooling(_map);
+
             switch (returnType)
             {
                 case LayerReturnType.Map:
-                    return _filterMatrix.DoMapFiltering(_map);
+                    return figureMap;
 
                 case LayerReturnType.Neurons:
                     // TODO: Реализовать возврат нейронов.
@@ -106,12 +107,5 @@
 
             _map = map;
         }
-
-        /// <summary>
-        /// Обновление фильтра.
-        /// </summary>
-        /// <param name="cells">Новые ячейки.</param>
-        public void UpdateFilterCore(List<Cell> cells)
-            => _filterMatrix.UpdateFilterMatrix(cells);
     }
 }

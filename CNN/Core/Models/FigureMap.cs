@@ -9,7 +9,7 @@
     /// <summary>
     /// Карта изображения.
     /// </summary>
-    public class FigureMap
+    internal class FigureMap
     {
         /// <summary>
         /// Размер.

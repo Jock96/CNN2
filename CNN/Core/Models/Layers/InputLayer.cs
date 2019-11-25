@@ -7,7 +7,7 @@
     /// <summary>
     /// Входной слой.
     /// </summary>
-    public class InputLayer : Layer
+    internal class InputLayer : Layer
     {
         /// <summary>
         /// Тип слоя.

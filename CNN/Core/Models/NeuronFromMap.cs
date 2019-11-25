@@ -7,7 +7,7 @@
     /// <summary>
     /// Нейрон, преобразованный из карты изображения.
     /// </summary>
-    public class NeuronFromMap : Neuron
+    internal class NeuronFromMap : Neuron
     {
         /// <summary>
         /// Нейрон, преобразованный из карты изображения.

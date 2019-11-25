@@ -3,7 +3,7 @@
     /// <summary>
     /// Тип выходного слоя.
     /// </summary>
-    public enum OutputLayerType
+    internal enum OutputLayerType
     {
         /// <summary>
         /// Распознавание числе.

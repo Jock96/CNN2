@@ -7,7 +7,7 @@
     /// <summary>
     /// Слой пуллинга.
     /// </summary>
-    public class SubsamplingLayer : Layer
+    internal class SubsamplingLayer : Layer
     {
         /// <summary>
         /// Тип слоя.

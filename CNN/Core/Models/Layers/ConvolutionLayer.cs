@@ -8,7 +8,7 @@
     /// <summary>
     /// Свёрточный слой.
     /// </summary>
-    public class ConvolutionLayer : Layer
+    internal class ConvolutionLayer : Layer
     {
         /// <summary>
         /// Тип слоя.

@@ -3,7 +3,7 @@
     /// <summary>
     /// Тип мода сети.
     /// </summary>
-    public enum NetworkModeType
+    internal enum NetworkModeType
     {
         /// <summary>
         /// Обучение.

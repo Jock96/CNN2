@@ -3,7 +3,7 @@
     /// <summary>
     /// Тип возвращаемого со слоя значений.
     /// </summary>
-    public enum LayerReturnType
+    internal enum LayerReturnType
     {
         /// <summary>
         /// Нейроны.

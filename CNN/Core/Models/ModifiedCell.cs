@@ -3,7 +3,7 @@
     /// <summary>
     /// Модифицируемая ячейка.
     /// </summary>
-    public class ModifiedCell : Cell
+    internal class ModifiedCell : Cell
     {
         /// <summary>
         /// Модифицируемая ячейка..

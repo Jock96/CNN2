@@ -5,7 +5,7 @@
     /// <summary>
     /// Расширения стандартного класса Random.
     /// </summary>
-    public static class RandomExtensions
+    internal static class RandomExtensions
     {
         /// <summary>
         /// 

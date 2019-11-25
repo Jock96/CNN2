@@ -5,7 +5,7 @@
     /// <summary>
     /// Слой.
     /// </summary>
-    public abstract class Layer
+    internal abstract class Layer
     {
         /// <summary>
         /// Тип слоя.

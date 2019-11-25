@@ -9,7 +9,7 @@
     /// <summary>
     /// Выходной слой.
     /// </summary>
-    public class OutputLayer : Layer
+    internal class OutputLayer : Layer
     {
         /// <summary>
         /// Тип слоя.

@@ -3,7 +3,7 @@
     /// <summary>
     /// Ячейка.
     /// </summary>
-    public class Cell
+    internal class Cell
     {
         /// <summary>
         /// Позиция по X.

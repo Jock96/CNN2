@@ -11,7 +11,7 @@
     /// <summary>
     /// Матрица фильтра.
     /// </summary>
-    public class FilterMatrix
+    internal class FilterMatrix
     {
         /// <summary>
         /// Размер.

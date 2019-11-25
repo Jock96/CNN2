@@ -3,7 +3,7 @@
     /// <summary>
     /// Тип функции активации.
     /// </summary>
-    public enum ActivationFunctionType
+    internal enum ActivationFunctionType
     {
         /// <summary>
         /// Сигмоид.

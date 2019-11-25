@@ -8,7 +8,7 @@
     /// <summary>
     /// Класс нейрона.
     /// </summary>
-    public class Neuron
+    internal class Neuron
     {
         /// <summary>
         /// Тип функции активации.

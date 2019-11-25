@@ -9,7 +9,7 @@
     /// <summary>
     /// Скрытый слой.
     /// </summary>
-    public class HiddenLayer : Layer
+    internal class HiddenLayer : Layer
     {
         /// <summary>
         /// Тип слоя.

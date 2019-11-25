@@ -6,7 +6,7 @@
     /// <summary>
     /// Матрица макс-пулинга.
     /// </summary>
-    public class PoolingMatrix
+    internal class PoolingMatrix
     {
         /// <summary>
         /// Размер.

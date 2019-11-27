@@ -57,6 +57,7 @@
                 {
                     lastWeights.Add(0);
                     var value = new Random().NextDouble(0.0001, 0.2);
+                    System.Threading.Thread.Sleep(20);
                     weights.Add(value);
                 }
 

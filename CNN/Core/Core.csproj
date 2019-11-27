@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums\ActivationFunctionType.cs" />
+    <Compile Include="Enums\DataSetType.cs" />
     <Compile Include="Enums\LayerReturnType.cs" />
     <Compile Include="Enums\LayerType.cs" />
     <Compile Include="Enums\NetworkModeType.cs" />
@@ -50,6 +51,7 @@
     <Compile Include="Enums\TrainType.cs" />
     <Compile Include="Extensions\RandomExtensions.cs" />
     <Compile Include="Models\Cell.cs" />
+    <Compile Include="Models\DataSet.cs" />
     <Compile Include="Models\FigureMap.cs" />
     <Compile Include="Models\FilterMatrix.cs" />
     <Compile Include="Models\HyperParameters.cs" />

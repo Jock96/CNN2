@@ -58,6 +58,7 @@
             if (type.Equals(NetworkModeType.Learning))
             {
                 _filterMatrix = new FilterMatrix(_filterMatrixSize, type);
+                _filterMatrix.Initialize();
             }
             else
             {

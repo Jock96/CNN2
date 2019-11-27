@@ -66,6 +66,8 @@
         {
             var realScheme = InitializeRealScheme(filterMatrixSize, poolingMatrixSize);
 
+            var x = realScheme.Last().Value.First().GetData(LayerReturnType.Neurons);
+
             // TODO: Обратное распространение.
             // Обновление значений
         }
@@ -103,7 +105,7 @@
                             var previousKey = pair.Key - 1;
 
                             var previousElements = realScheme[previousKey];
-                            var previousType = virtualScheme[previousKey];
+                            var previousType = virtualScheme[previousKey].First();
 
                             if (previousElements.Count != virtualElements.Count &&
                                 previousType.Equals(LayerType.Input))
@@ -125,7 +127,7 @@
                             previousKey = pair.Key - 1;
 
                             previousElements = realScheme[previousKey];
-                            previousType = virtualScheme[previousKey];
+                            previousType = virtualScheme[previousKey][index];
 
                             if (previousElements.Count == virtualElements.Count &&
                                 previousType.Equals(LayerType.Convolution))
@@ -147,7 +149,7 @@
                             previousKey = pair.Key - 1;
 
                             previousElements = realScheme[previousKey];
-                            previousType = virtualScheme[previousKey];
+                            previousType = virtualScheme[previousKey][index];
 
                             if (previousElements.Count == virtualElements.Count &&
                                 previousType.Equals(LayerType.Subsampling))
@@ -169,18 +171,25 @@
                             previousKey = pair.Key - 1;
 
                             previousElements = realScheme[previousKey];
-                            previousType = virtualScheme[previousKey];
+                            previousType = virtualScheme[previousKey][index];
 
                             if (previousElements.Count > virtualElements.Count &&
                                 previousType.Equals(LayerType.Hidden))
                             {
-                                var previousElement = previousElements[index] as HiddenLayer;
+                                var allData = new List<double>();
 
-                                if (previousElement is null)
-                                    throw new Exception("Предыдущий слой оказался Null!");
+                                foreach (var elementInLastLayer in previousElements)
+                                {
+                                    var previousElement = elementInLastLayer as HiddenLayer;
 
-                                var neurons = previousElement.GetData(LayerReturnType.Neurons);
-                                element = new OutputLayer(neurons);
+                                    if (previousElement is null)
+                                        throw new Exception("Предыдущий слой оказался Null!");
+
+                                    var data = previousElement.GetData(LayerReturnType.Neurons) as List<double>;
+                                    allData.AddRange(data);
+                                }
+
+                                element = new OutputLayer(allData);
                                 element.Initialize(NetworkModeType.Learning);
                             }
                             else

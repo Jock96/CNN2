@@ -41,16 +41,16 @@
             var matrix = new double[sectorsInLine, sectorsInLine];
 
             for (var xStartIndex = 0; xStartIndex < sectorsInLine; xStartIndex += Size)
-                for (var yStartIndex = 0; xStartIndex < sectorsInLine; yStartIndex += Size)
+                for (var yStartIndex = 0; yStartIndex < sectorsInLine; yStartIndex += Size)
                 {
                     var xEndIndex = xStartIndex + Size;
                     var yEndIndex = yStartIndex + Size;
 
                     var elements = map.Cells.FindAll(
                         cell => cell.X >= xStartIndex &&
-                        cell.X <= xEndIndex &&
+                        cell.X < xEndIndex &&
                         cell.Y >= yStartIndex &&
-                        cell.Y <= yEndIndex);
+                        cell.Y < yEndIndex);
 
                     matrix[xStartIndex / Size, yStartIndex / Size] = GetMaxValue(elements);
                 }

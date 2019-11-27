@@ -18,7 +18,8 @@
         /// <summary>
         /// Выборка для чисел.
         /// </summary>
-        private Dictionary<int, List<double[,]>> _dataSetForNumbers { get; set; }
+        private Dictionary<int, List<double[,]>> _dataSetForNumbers { get; set; } 
+            = new Dictionary<int, List<double[,]>>();
 
         /// <summary>
         /// Максимальное количество добавляемых элементов в выборку для чисел

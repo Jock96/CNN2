@@ -62,9 +62,13 @@
             catch (Exception exception)
             {
                 Console.BackgroundColor = ConsoleColor.Red;
+                Console.ForegroundColor = ConsoleColor.Black;
                 Console.WriteLine(exception.Message);
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.BackgroundColor = ConsoleColor.Black;
-            }            
+            }
+
+            Console.ReadKey();
         }
     }
 }

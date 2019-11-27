@@ -109,9 +109,9 @@
 
                     var choosenCells = map.Cells.FindAll(
                         cell => cell.X >= xStartIndex &&
-                        cell.X <= xEndIndex &&
+                        cell.X < xEndIndex &&
                         cell.Y >= yStartIndex &&
-                        cell.Y <= yEndIndex);
+                        cell.Y < yEndIndex);
 
                     var cellsToRewrite = new List<Cell>();
                     

@@ -23,7 +23,7 @@
         /// <summary>
         /// Имя модуля бизнес-логики.
         /// </summary>
-        public const string BL_MODEL_NAME = "\\CNN.BL";
+        public const string BL_MODEL_NAME = "\\BL";
 
         /// <summary>
         /// Расширение файла изображения.

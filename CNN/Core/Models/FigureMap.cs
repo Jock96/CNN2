@@ -36,35 +36,60 @@
         /// Преобразовать в список нейронов.
         /// </summary>
         /// <returns>Возвращает список нейронов.</returns>
-        public List<Neuron> ToNeuronList()
+        public List<NeuronFromMap> ToNeuronList(bool isNeedActivate)
         {
-            var neurons = new List<Neuron>();
-            int countOnLayer;
-
-            if (Cells.Count.Equals(1))
-                countOnLayer = 1;
-            else
-                countOnLayer = Cells.Count / 2;
-
-            for (var index = 0; index < countOnLayer; ++index)
+            if (isNeedActivate)
             {
-                var inputs = Cells.Select(cell => cell.Value).ToList();
+                var neurons = new List<NeuronFromMap>();
+                int countOnLayer;
 
-                var lastWeights = new List<double>();
-                var weights = new List<double>();
+                if (Cells.Count.Equals(1))
+                    countOnLayer = 1;
+                else
+                    countOnLayer = Cells.Count / 2;
 
-                for (var w = 0; w < Cells.Count; ++w)
+                for (var index = 0; index < countOnLayer; ++index)
                 {
-                    lastWeights.Add(0);
-                    var value = new Random().NextDouble(0.0001, 0.2);
-                    System.Threading.Thread.Sleep(20);
-                    weights.Add(value);
+                    var inputs = Cells.Select(cell => cell.Value).ToList();
+
+                    var lastWeights = new List<double>();
+
+                    var weights = new List<double>();
+                    var weightsToMapPosition = new List<WeightToMapPosition>();
+
+                    for (var w = 0; w < Cells.Count; ++w)
+                    {
+                        lastWeights.Add(0);
+
+                        var value = new Random().NextDouble(0.0001, 0.2);
+                        System.Threading.Thread.Sleep(20);
+
+                        weights.Add(value);
+
+                        var weightToMapPosition = new WeightToMapPosition()
+                        {
+                            LastValueDelta = 0,
+                            OwnerCell = Cells[w],
+                            Value = value
+                        };
+
+                        weightsToMapPosition.Add(weightToMapPosition);
+                    }
+
+                    var neuron = new NeuronFromMap(inputs, weights)
+                    {
+                        LastWeightsDeltas = lastWeights,
+                        WeightsToMapPosition = weightsToMapPosition
+                    };
+
+                    neurons.Add(neuron);
                 }
 
-                neurons.Add(new Neuron(inputs, weights) { LastWeightsDeltas = lastWeights });
+                return neurons;
             }
 
-            return neurons;
+            // TODO: Реализовать!
+            throw new NotImplementedException();
         }
 
         /// <summary>

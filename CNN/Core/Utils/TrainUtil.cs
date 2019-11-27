@@ -115,6 +115,8 @@
                 SetDeltasInHiddenLayer(outputNeuron, neurons);
                 UpdateWeightsInHiddenLayer(outputNeuron, neurons);
 
+                // Hidden sub
+
                 var subsamplingLayersDictionary = realScheme
                     .Where(layer => layer.Value.First().Type.Equals(LayerType.Subsampling))
                     .ToDictionary(x => x.Key, y => y.Value);
@@ -123,7 +125,6 @@
                     .Where(layer => layer.Value.First().Type.Equals(LayerType.Convolution))
                     .ToDictionary(x => x.Key, y => y.Value);
 
-                // Hidden sub
                 // Sub conv
                 // Conv in
             }

@@ -19,7 +19,7 @@
         /// <summary>
         /// Список нейронов скрытого слоя.
         /// </summary>
-        private List<Neuron> _neurons;
+        private List<NeuronFromMap> _neurons;
 
         /// <summary>
         /// Выходные значения.
@@ -30,7 +30,7 @@
         /// Скрытый слой.
         /// </summary>
         /// <param name="neurons">Нейроны.</param>
-        public HiddenLayer(List<Neuron> neurons)
+        public HiddenLayer(List<NeuronFromMap> neurons)
         {
             if (!neurons.Any())
                 throw new Exception("Скрытому слою не были переданы нейроны! " +
@@ -66,7 +66,7 @@
         /// <summary>
         /// Запись данных слоя.
         /// </summary>
-        public void SetData(List<Neuron> neurons)
+        public void SetData(List<NeuronFromMap> neurons)
         {
             if (!neurons.Count.Equals(_neurons.Count))
                 throw new Exception("Количество переданных нейронов не соттвествует количеству нейроно на слое!");

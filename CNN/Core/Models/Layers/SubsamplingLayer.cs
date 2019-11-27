@@ -15,9 +15,9 @@
         public override LayerType Type => LayerType.Subsampling;
 
         /// <summary>
-        /// Карта изображения.
+        /// Входная карта изображения.
         /// </summary>
-        private FigureMap _map;
+        public FigureMap Map { get; private set; }
 
         /// <summary>
         /// Размер матрицы макс-пуллинга.
@@ -41,7 +41,7 @@
         /// <param name="poolingMatrixSize">Размер матрицы макс-пуллинга.</param>
         public SubsamplingLayer(FigureMap map, int poolingMatrixSize)
         {
-            _map = map;
+            Map = map;
             _poolingMatrixSize = poolingMatrixSize;
         }
 
@@ -68,6 +68,11 @@
         }
 
         /// <summary>
+        /// Необходимо ли активировать нейроны перед передачей в выход?
+        /// </summary>
+        private bool _isNeedActivateNeurons = true;
+
+        /// <summary>
         /// Получить данные слоя.
         /// </summary>
         /// <param name="returnType">Тип возвращаемых значений.</param>
@@ -77,7 +82,7 @@
             if (!_isInitialized)
                 throw new Exception("Слой не инициализирован и не может вернуть значения!");
 
-            var figureMap = _poolingMatrix.DoMaxPooling(_map);
+            var figureMap = _poolingMatrix.DoMaxPooling(Map);
 
             switch (returnType)
             {
@@ -85,7 +90,9 @@
                     return figureMap;
 
                 case LayerReturnType.Neurons:
-                    return figureMap.ToNeuronList();
+                    var output = figureMap.ToNeuronList(_isNeedActivateNeurons);
+                    _isNeedActivateNeurons = false;
+                    return output;
 
                 default:
                     throw new Exception("Неизвестный тип возвращаемого значения!");
@@ -101,10 +108,10 @@
             if (!_isInitialized)
                 throw new Exception("Перед внесением данных в слой необходимо его проинициализировать!");
 
-            if (!map.Cells.Count.Equals(_map.Cells.Count))
+            if (!map.Cells.Count.Equals(Map.Cells.Count))
                 throw new Exception("Размерность карты значений не совпадает!");
 
-            _map = map;
+            Map = map;
         }
     }
 }

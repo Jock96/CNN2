@@ -16,6 +16,16 @@
         public int Y { get; protected set; }
 
         /// <summary>
+        /// Дельта ячейки.
+        /// </summary>
+        public double Delta { get; protected set; }
+
+        /// <summary>
+        /// Последняя дельта значения.
+        /// </summary>
+        public double LastValueDelta { get; protected set; }
+
+        /// <summary>
         /// Значение.
         /// </summary>
         public double Value { get; protected set; }

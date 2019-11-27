@@ -50,6 +50,7 @@
     <Compile Include="Enums\OutputLayerType.cs" />
     <Compile Include="Enums\TrainType.cs" />
     <Compile Include="Extensions\RandomExtensions.cs" />
+    <Compile Include="Helper\MapHelper.cs" />
     <Compile Include="Models\Cell.cs" />
     <Compile Include="Models\DataSet.cs" />
     <Compile Include="Models\FigureMap.cs" />

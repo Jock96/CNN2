@@ -16,15 +16,18 @@
         /// <param name="weights">Веса.</param>
         /// <param name="cell">Ячейка карты изображений, из которой преобразован нейрон.</param>
         /// <param name="type">Тип ункции активации (сигмоид по-умолчанию).</param>
-        public NeuronFromMap(List<double> inputs, List<double> weights, Cell cell,
+        public NeuronFromMap(List<double> inputs, List<double> weights,
             ActivationFunctionType type = ActivationFunctionType.Sigmoid) : base(inputs, weights, type)
         {
             Inputs = inputs;
             Weights = weights;
             ActivationFinctionType = type;
-            X = cell.X;
-            Y = cell.Y;
         }
+
+        /// <summary>
+        /// Значение весов с отношением к позиции в карте предыдущего слоя.
+        /// </summary>
+        public List<WeightToMapPosition> WeightsToMapPosition { get; set; }
 
         /// <summary>
         /// Позиция в карте по X.

@@ -52,7 +52,7 @@
             switch (returnType)
             {
                 case LayerReturnType.Neurons:
-                    return _outputs;
+                    return _neurons;
 
                 case LayerReturnType.Map:
                     //TODO: Доделать.

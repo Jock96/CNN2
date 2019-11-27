@@ -61,7 +61,7 @@
                     weights.Add(value);
                 }
 
-                neurons.Add(new Neuron(inputs, weights) { LastWeights = lastWeights });
+                neurons.Add(new Neuron(inputs, weights) { LastWeightsDeltas = lastWeights });
             }
 
             return neurons;

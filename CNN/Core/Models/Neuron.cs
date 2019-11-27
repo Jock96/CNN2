@@ -1,7 +1,7 @@
 ﻿namespace Core.Models
 {
     using Core.Enums;
-
+    using Core.Utils;
     using System;
     using System.Collections.Generic;
 
@@ -13,7 +13,7 @@
         /// <summary>
         /// Тип функции активации.
         /// </summary>
-        protected ActivationFunctionType _type;
+        public ActivationFunctionType ActivationFinctionType { get; protected set; }
 
         /// <summary>
         /// Класс нейрона.
@@ -36,9 +36,9 @@
         public double Delta { get; set; }
 
         /// <summary>
-        /// Прошлое значение весов.
+        /// Прошлое значение дельт весов.
         /// </summary>
-        public List<double> LastWeights { get; set; }
+        public List<double> LastWeightsDeltas { get; set; }
 
         #endregion
 
@@ -92,17 +92,7 @@
             for (int index = 0; index < inputs.Count; ++index)
                 summary += inputs[index] * weights[index];
 
-            switch (_type)
-            {
-                case ActivationFunctionType.Sigmoid:
-                    return Math.Pow(1 + Math.Exp(-summary), -1);
-
-                case ActivationFunctionType.HyperTan:
-                    return (Math.Exp(2 * summary) - 1) / (Math.Exp(2 * summary) + 1);
-
-                default:
-                    throw new Exception("Неизвестный тип функции активации!");
-            }
+            return MathUtil.ActivationFunction(ActivationFinctionType, summary);
         }
 
     }

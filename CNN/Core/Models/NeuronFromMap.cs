@@ -21,7 +21,7 @@
         {
             Inputs = inputs;
             Weights = weights;
-            _type = type;
+            ActivationFinctionType = type;
             X = cell.X;
             Y = cell.Y;
         }

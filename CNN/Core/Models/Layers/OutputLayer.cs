@@ -82,7 +82,7 @@
             // Ключ - номер нейрона, значение - сам нейрон.
 
             var indexToNeuronDictionary = new Dictionary<int, Neuron>();
-            var index = 1;
+            var index = 0;
 
             foreach (var neuron in _layerNeurons)
             {
@@ -138,7 +138,7 @@
                     weights.Add(value);
                 }
 
-                _layerNeurons.Add(new Neuron(_inputs, weights) { LastWeights = lastWeights });
+                _layerNeurons.Add(new Neuron(_inputs, weights) { LastWeightsDeltas = lastWeights });
             }
         }
     }

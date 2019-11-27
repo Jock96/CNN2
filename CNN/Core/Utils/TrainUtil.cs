@@ -65,11 +65,138 @@
         public void Start(int filterMatrixSize, int poolingMatrixSize, bool isNeedSave = true)
         {
             var realScheme = InitializeRealScheme(filterMatrixSize, poolingMatrixSize);
+            var outputs = realScheme.Last().Value.First().GetData(LayerReturnType.Neurons) as Dictionary<int, Neuron>;
 
-            var x = realScheme.Last().Value.First().GetData(LayerReturnType.Neurons);
+            var epochCount = _hyperParameters.EpochCount;
+            var iterationCount = outputs.Count();
 
-            // TODO: Обратное распространение.
-            // Обновление значений
+            for (var epoch = 0; epoch < epochCount; ++epoch)
+                for (var iteration = 0; iteration < iterationCount; ++iteration)
+                {
+                    var currentOutput = outputs[iteration].Output;
+
+                    switch (_trainType)
+                    {
+                        case TrainType.Backpropagation:
+                            DoBackpropagation(realScheme, iteration);
+                            break;
+
+                        case TrainType.Neuroevolution:
+                            throw new NotImplementedException();
+
+                        default:
+                            throw new Exception("Неизвестный тип обучения!");
+                    }
+
+                    // TODO: Обновление значений.
+                }
+
+            // TODO:Сохранение значений.
+        }
+
+
+        private void DoBackpropagation(Dictionary<int, List<Layer>> realScheme, int iteration)
+        {
+            var outputLayer = realScheme.Last().Value.ToList().FirstOrDefault() as OutputLayer;
+            var outputLayerNeurons = outputLayer.GetData(LayerReturnType.Neurons) as Dictionary<int, Neuron>;
+
+            SetDeltasInOutputLayer(outputLayer, iteration);
+
+            foreach (var outputNeuron in outputLayerNeurons)
+            {
+                // Output hidden
+                var hiddenLayersDictionary = realScheme
+                .Where(layer => layer.Value.First().Type.Equals(LayerType.Hidden))
+                .ToDictionary(x => x.Key, y => y.Value);
+
+                var neurons = hiddenLayersDictionary.Values.SelectMany(pair => pair
+                .SelectMany(layer => layer.GetData(LayerReturnType.Neurons) as List<Neuron>)).ToList();
+
+                SetDeltasInHiddenLayer(outputNeuron, neurons);
+                UpdateWeightsInHiddenLayer(outputNeuron, neurons);
+
+                var subsamplingLayersDictionary = realScheme
+                    .Where(layer => layer.Value.First().Type.Equals(LayerType.Subsampling))
+                    .ToDictionary(x => x.Key, y => y.Value);
+
+                var convolutionLayersDictionary = realScheme
+                    .Where(layer => layer.Value.First().Type.Equals(LayerType.Convolution))
+                    .ToDictionary(x => x.Key, y => y.Value);
+
+                // Hidden sub
+                // Sub conv
+                // Conv in
+            }
+        }
+
+        private void UpdateWeightsInHiddenLayer(KeyValuePair<int, Neuron> outputNeuron, List<Neuron> neurons)
+        {
+            var deltaWeightsList = new List<double>();
+
+            var indexer = 0;
+            foreach (var neuron in neurons)
+            {
+                var gradient = neuron.Delta * neuron.Output;
+                var deltaWeight = MathUtil.GetWeightsDelta(_hyperParameters, outputNeuron.Value, gradient, indexer);
+
+                deltaWeightsList.Add(deltaWeight);
+                ++indexer;
+            }
+
+            outputNeuron.Value.LastWeightsDeltas = deltaWeightsList;
+
+            for (var index = 0; index < outputNeuron.Value.Weights.Count; ++index)
+                outputNeuron.Value.Weights[index] += deltaWeightsList[index];
+        }
+
+        /// <summary>
+        /// Обновить дельты скрытого слоя.
+        /// </summary>
+        /// <param name="outputNeuron">Нейрон выходного слоя.</param>
+        /// <param name="neurons">Нейроны скрытого слоя.</param>
+        private static void SetDeltasInHiddenLayer(KeyValuePair<int, Neuron> outputNeuron, List<Neuron> neurons)
+        {
+            foreach (var neuron in neurons)
+            {
+                var summary = 0d;
+
+                foreach (var inputWeight in outputNeuron.Value.Weights)
+                    summary += inputWeight * outputNeuron.Value.Delta;
+
+                neuron.Delta = neuron.Output * summary;
+            }
+        }
+
+        /// <summary>
+        /// Установить значение дельт в выходном слое.
+        /// </summary>
+        /// <param name="outputLayer">Выходной слой.</param>
+        /// <param name="iteration">Итерация.</param>
+        private static void SetDeltasInOutputLayer(OutputLayer outputLayer, int iteration)
+        {
+            if (outputLayer is null)
+                throw new Exception("Выходной слой оказался Null!");
+
+            var outputNeurons = outputLayer.GetData(LayerReturnType.Neurons) as Dictionary<int, Neuron>;
+
+            var resultToAccept = 1;
+            var resultToDenied = 0;
+
+            var idealNeuron = outputNeurons[iteration];
+            idealNeuron.Delta = MathUtil.GetDeltaToOutput(idealNeuron, resultToAccept);
+
+            var otherNeurons = new List<Neuron>();
+
+            foreach (var pair in outputNeurons)
+            {
+                if (pair.Key.Equals(iteration))
+                    continue;
+
+                otherNeurons.Add(pair.Value);
+            }
+
+            otherNeurons.ForEach(neuron => neuron.Delta =
+            MathUtil.GetDeltaToOutput(neuron, resultToDenied));
         }
 
         /// <summary>
@@ -176,7 +303,7 @@
                             if (previousElements.Count > virtualElements.Count &&
                                 previousType.Equals(LayerType.Hidden))
                             {
-                                var allData = new List<double>();
+                                var neurons = new List<Neuron>();
 
                                 foreach (var elementInLastLayer in previousElements)
                                 {
@@ -185,11 +312,13 @@
                                     if (previousElement is null)
                                         throw new Exception("Предыдущий слой оказался Null!");
 
-                                    var data = previousElement.GetData(LayerReturnType.Neurons) as List<double>;
-                                    allData.AddRange(data);
+                                    var data = previousElement.GetData(LayerReturnType.Neurons) as List<Neuron>;
+                                    neurons.AddRange(data);
                                 }
 
-                                element = new OutputLayer(allData);
+                                var outputs = neurons.Select(neuron => neuron.Output).ToList();
+
+                                element = new OutputLayer(outputs);
                                 element.Initialize(NetworkModeType.Learning);
                             }
                             else

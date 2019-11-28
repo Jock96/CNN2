@@ -85,7 +85,7 @@
         /// <param name="inputs">Входные данные.</param>
         /// <param name="weights">Веса.</param>
         /// <returns>Возвращает нормализованное выходное значение.</returns>
-        private double ActivationFunction(List<double> inputs, List<double> weights)
+        protected double ActivationFunction(List<double> inputs, List<double> weights)
         {
             var summary = 0d;
 

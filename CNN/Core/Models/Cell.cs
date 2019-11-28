@@ -18,7 +18,7 @@
         /// <summary>
         /// Дельта ячейки.
         /// </summary>
-        public double Delta { get; protected set; }
+        public double Delta { get; set; }
 
         /// <summary>
         /// Последняя дельта значения.

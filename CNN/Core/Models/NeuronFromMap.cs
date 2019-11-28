@@ -1,7 +1,7 @@
 ﻿namespace Core.Models
 {
     using System.Collections.Generic;
-
+    using System.Linq;
     using Core.Enums;
 
     /// <summary>
@@ -30,13 +30,12 @@
         public List<WeightToMapPosition> WeightsToMapPosition { get; set; }
 
         /// <summary>
-        /// Позиция в карте по X.
+        /// Выходное значение.
         /// </summary>
-        public int X { get; private set; }
-
-        /// <summary>
-        /// Позиция в карте по Y.
-        /// </summary>
-        public int Y { get; private set; }
+        public new double Output
+        {
+            get => ActivationFunction(Inputs,
+                WeightsToMapPosition.Select(weight => weight.Value).ToList());
+        }
     }
 }

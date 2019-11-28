@@ -74,5 +74,15 @@
             hyperParameters.Alpha * 
             outputNeuron.LastWeightsDeltas[indexOfCurrentNeuron];
 
+        /// <summary>
+        /// Получить дельту веса.
+        /// </summary>
+        /// <param name="hyperParameters">Гиперпараметры.</param>
+        /// <param name="gradient">Градиент.</param>
+        /// <param name="lastDeltaValue">Последние значение дельты веса.</param>
+        /// <returns>Возвращает дельту веса.</returns>
+        internal static double GetWeightsDelta(HyperParameters hyperParameters,
+            double gradient, double lastDeltaValue) =>
+            hyperParameters.Epsilon * gradient + hyperParameters.Alpha * lastDeltaValue;
     }
 }

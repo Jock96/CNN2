@@ -110,10 +110,10 @@
                 .ToDictionary(x => x.Key, y => y.Value);
 
                 var neurons = hiddenLayersDictionary.Values.SelectMany(pair => pair
-                .SelectMany(layer => layer.GetData(LayerReturnType.Neurons) as List<Neuron>)).ToList();
+                .SelectMany(layer => layer.GetData(LayerReturnType.Neurons) as List<NeuronFromMap>)).ToList();
 
                 SetDeltasInHiddenLayer(outputNeuron, neurons);
-                UpdateWeightsInHiddenLayer(outputNeuron, neurons);
+                UpdateWeightsHiddenToOutut(outputNeuron, neurons);
 
                 // Hidden sub
 
@@ -121,16 +121,92 @@
                     .Where(layer => layer.Value.First().Type.Equals(LayerType.Subsampling))
                     .ToDictionary(x => x.Key, y => y.Value);
 
+                var hiddenLayers = hiddenLayersDictionary.Values.
+                    SelectMany(value => value.Select(layer => layer)).ToList();
+
+                var subsamplingLayers = subsamplingLayersDictionary.Values.
+                    SelectMany(value => value.Select(layer => layer)).ToList();
+
+                var index = 0;
+                foreach (var layer in subsamplingLayers)
+                {
+                    var subsamplingLayer = layer as SubsamplingLayer;
+                    var hiddenLayer = hiddenLayers[index];
+
+                    var hiddenLayerNeurons = hiddenLayer.GetData(LayerReturnType.Neurons) as List<NeuronFromMap>;
+                    var map = layer.GetData(LayerReturnType.Map) as FigureMap;
+
+                    SetDeltasInSubSamplingLayer(hiddenLayerNeurons, map);
+                    UpdateWeightsSubsamplingToHidden(hiddenLayerNeurons, map);
+
+                    ++index;
+                }
+
+                // Sub conv
+
                 var convolutionLayersDictionary = realScheme
                     .Where(layer => layer.Value.First().Type.Equals(LayerType.Convolution))
                     .ToDictionary(x => x.Key, y => y.Value);
 
-                // Sub conv
                 // Conv in
             }
         }
 
-        private void UpdateWeightsInHiddenLayer(KeyValuePair<int, Neuron> outputNeuron, List<Neuron> neurons)
+        /// <summary>
+        /// Обновление весов между слоем макс-пуллинга и скрытым.
+        /// </summary>
+        /// <param name="hiddenLayerNeurons">Нейроны скрытого слоя.</param>
+        /// <param name="map">Карта слоя макс-пуллинга.</param>
+        private void UpdateWeightsSubsamplingToHidden(List<NeuronFromMap> hiddenLayerNeurons, FigureMap map)
+        {
+            foreach (var cell in map.Cells)
+            {
+                foreach (var neuron in hiddenLayerNeurons)
+                {
+                    var gradient = neuron.Delta * cell.Value;
+
+                    var weight = neuron.WeightsToMapPosition.
+                        Find(weightInfo => weightInfo.OwnerCell.X.Equals(cell.X) &&
+                        weightInfo.OwnerCell.Y.Equals(cell.Y));
+
+                    var weightDelta = MathUtil.GetWeightsDelta(_hyperParameters, gradient, weight.LastValueDelta);
+                    weight.LastValueDelta = weightDelta;
+                    weight.Value += weightDelta;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Задать дельты слоя макс-пуллинга.
+        /// </summary>
+        /// <param name="hiddenLayerNeurons">Нейроны скрытого слоя.</param>
+        /// <param name="map">Карта слоя макс-пуллинга.</param>
+        private static void SetDeltasInSubSamplingLayer(List<NeuronFromMap> hiddenLayerNeurons, FigureMap map)
+        {
+            foreach (var cell in map.Cells)
+            {
+                var summary = 0d;
+
+                foreach (var neuron in hiddenLayerNeurons)
+                {
+                    var weightInfo = neuron.WeightsToMapPosition.
+                        Find(weight => weight.OwnerCell.X.Equals(cell.X) &&
+                        weight.OwnerCell.Y.Equals(cell.Y));
+
+                    summary += weightInfo.Value * neuron.Delta;
+                }
+
+                cell.Delta = MathUtil.DerivativeActivationFunction(cell.Value,
+                    ActivationFunctionType.Sigmoid) * summary;
+            }
+        }
+
+        /// <summary>
+        /// Обновление весов между скрытым и выходным слоем.
+        /// </summary>
+        /// <param name="outputNeuron">Выходной нейрон.</param>
+        /// <param name="neurons">Нейроны скрытого слоя.</param>
+        private void UpdateWeightsHiddenToOutut(KeyValuePair<int, Neuron> outputNeuron, List<NeuronFromMap> neurons)
         {
             var deltaWeightsList = new List<double>();
 
@@ -155,7 +231,7 @@
         /// </summary>
         /// <param name="outputNeuron">Нейрон выходного слоя.</param>
         /// <param name="neurons">Нейроны скрытого слоя.</param>
-        private static void SetDeltasInHiddenLayer(KeyValuePair<int, Neuron> outputNeuron, List<Neuron> neurons)
+        private static void SetDeltasInHiddenLayer(KeyValuePair<int, Neuron> outputNeuron, List<NeuronFromMap> neurons)
         {
             foreach (var neuron in neurons)
             {
@@ -287,7 +363,7 @@
                                 if (previousElement is null)
                                     throw new Exception("Предыдущий слой оказался Null!");
 
-                                var neurons = previousElement.GetData(LayerReturnType.Neurons);
+                                var neurons = previousElement.GetData(LayerReturnType.Neurons) as List<NeuronFromMap>;
                                 element = new HiddenLayer(neurons);
                                 element.Initialize(NetworkModeType.Learning);
                             }
@@ -313,7 +389,7 @@
                                     if (previousElement is null)
                                         throw new Exception("Предыдущий слой оказался Null!");
 
-                                    var data = previousElement.GetData(LayerReturnType.Neurons) as List<Neuron>;
+                                    var data = previousElement.GetData(LayerReturnType.Neurons) as List<NeuronFromMap>;
                                     neurons.AddRange(data);
                                 }
 

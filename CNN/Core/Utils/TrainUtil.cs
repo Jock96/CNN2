@@ -15,6 +15,11 @@
     public class TrainUtil
     {
         /// <summary>
+        /// Виртуальная матрица макс-пуллинга.
+        /// </summary>
+        private VirtualMaxPoolingMatrix _virtualMaxPoolingMatrix;
+
+        /// <summary>
         /// Обучающая выборки.
         /// </summary>
         private DataSet _dataSet;
@@ -142,13 +147,17 @@
                     ++index;
                 }
 
-                // Sub conv
+                subsamplingLayers.ForEach(layer => 
+                    _virtualMaxPoolingMatrix.SetDeltaToConvolutionLayer(layer as SubsamplingLayer));
+
+                // Берём карту из слоёв выше это нейронысо значениями и дельтами
+                // Веса это матрица фильтра на слоях свёртки
+                // Для них дельты не вычисляем
+                // Находим им веса по дельтам из карты 1 пункта и весу (матрица фильтров)
 
                 var convolutionLayersDictionary = realScheme
                     .Where(layer => layer.Value.First().Type.Equals(LayerType.Convolution))
                     .ToDictionary(x => x.Key, y => y.Value);
-
-                // Conv in
             }
         }
 
@@ -181,7 +190,7 @@
         /// </summary>
         /// <param name="hiddenLayerNeurons">Нейроны скрытого слоя.</param>
         /// <param name="map">Карта слоя макс-пуллинга.</param>
-        private static void SetDeltasInSubSamplingLayer(List<NeuronFromMap> hiddenLayerNeurons, FigureMap map)
+        private void SetDeltasInSubSamplingLayer(List<NeuronFromMap> hiddenLayerNeurons, FigureMap map)
         {
             foreach (var cell in map.Cells)
             {
@@ -199,6 +208,8 @@
                 cell.Delta = MathUtil.DerivativeActivationFunction(cell.Value,
                     ActivationFunctionType.Sigmoid) * summary;
             }
+
+            _virtualMaxPoolingMatrix = new VirtualMaxPoolingMatrix(map.Cells);
         }
 
         /// <summary>

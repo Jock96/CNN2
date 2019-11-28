@@ -50,7 +50,6 @@
     <Compile Include="Enums\OutputLayerType.cs" />
     <Compile Include="Enums\TrainType.cs" />
     <Compile Include="Extensions\RandomExtensions.cs" />
-    <Compile Include="Helper\MapHelper.cs" />
     <Compile Include="Models\Cell.cs" />
     <Compile Include="Models\DataSet.cs" />
     <Compile Include="Models\FigureMap.cs" />
@@ -67,6 +66,7 @@
     <Compile Include="Models\NeuronFromMap.cs" />
     <Compile Include="Models\PoolingMatrix.cs" />
     <Compile Include="Models\Topology.cs" />
+    <Compile Include="Models\VirtualMaxPoolingMatrix.cs" />
     <Compile Include="Models\WeightToMapPosition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\MathUtil.cs" />

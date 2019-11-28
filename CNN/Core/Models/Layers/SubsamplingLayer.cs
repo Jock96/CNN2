@@ -32,7 +32,7 @@
         /// <summary>
         /// Матрица макс-пуллинга.
         /// </summary>
-        private PoolingMatrix _poolingMatrix;
+        public PoolingMatrix PoolingMatrix { get; private set; }
 
         /// <summary>
         /// Слой пуллинга.
@@ -56,7 +56,7 @@
 
             if (type.Equals(NetworkModeType.Learning))
             {
-                _poolingMatrix = new PoolingMatrix(_poolingMatrixSize);
+                PoolingMatrix = new PoolingMatrix(_poolingMatrixSize);
             }
             else
             {
@@ -82,7 +82,7 @@
             if (!_isInitialized)
                 throw new Exception("Слой не инициализирован и не может вернуть значения!");
 
-            var figureMap = _poolingMatrix.DoMaxPooling(Map);
+            var figureMap = PoolingMatrix.DoMaxPooling(Map);
 
             switch (returnType)
             {

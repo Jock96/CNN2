@@ -23,5 +23,11 @@
         /// </summary>
         /// <param name="newValue">Новое значение.</param>
         public void UpdatedValue(double newValue) => Value = newValue;
+
+        /// <summary>
+        /// Обновить последнее значение дельты.
+        /// </summary>
+        /// <param name="newValue">Новое значение.</param>
+        public void UpdateLastDeltValue(double newValue) => LastValueDelta = newValue;
     }
 }

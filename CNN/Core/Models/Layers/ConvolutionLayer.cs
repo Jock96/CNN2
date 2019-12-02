@@ -23,12 +23,12 @@
         /// <summary>
         /// Карта значений.
         /// </summary>
-        private FigureMap _map;
+        public FigureMap Map { get; private set; }
 
         /// <summary>
         /// Матрица фильтра.
         /// </summary>
-        private FilterMatrix _filterMatrix;
+        public FilterMatrix FilterMatrix { get; private set; }
 
         /// <summary>
         /// Слой инициализирован?
@@ -42,7 +42,7 @@
         /// <param name="filterMatrixSize">Размерность матрицы фильтра.</param>
         public ConvolutionLayer(FigureMap map, int filterMatrixSize)
         {
-            _map = map;
+            Map = map;
             _filterMatrixSize = filterMatrixSize;
         }
 
@@ -57,8 +57,8 @@
 
             if (type.Equals(NetworkModeType.Learning))
             {
-                _filterMatrix = new FilterMatrix(_filterMatrixSize, type);
-                _filterMatrix.Initialize();
+                FilterMatrix = new FilterMatrix(_filterMatrixSize, type);
+                FilterMatrix.Initialize();
             }
             else
             {
@@ -82,7 +82,7 @@
             switch (returnType)
             {
                 case LayerReturnType.Map:
-                    return _filterMatrix.DoMapFiltering(_map);
+                    return FilterMatrix.DoMapFiltering(Map);
 
                 case LayerReturnType.Neurons:
                     // TODO: Реализовать возврат нейронов.
@@ -102,10 +102,10 @@
             if (!_isInitialized)
                 throw new Exception("Перед внесением данных в слой необходимо его проинициализировать!");
 
-            if (!map.Cells.Count.Equals(_map.Cells.Count))
+            if (!map.Cells.Count.Equals(Map.Cells.Count))
                 throw new Exception("Размерность карты значений не совпадает!");
 
-            _map = map;
+            Map = map;
         }
 
         /// <summary>
@@ -113,6 +113,6 @@
         /// </summary>
         /// <param name="cells">Новые ячейки.</param>
         public void UpdateFilterCore(List<Cell> cells)
-            => _filterMatrix.UpdateFilterMatrix(cells);
+            => FilterMatrix.UpdateFilterMatrix(cells);
     }
 }

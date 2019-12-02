@@ -1,6 +1,7 @@
 ﻿namespace Core.Utils
 {
     using Core.Enums;
+    using Core.Helpers;
     using Core.Models;
     using Core.Models.Layers;
     using System;
@@ -99,7 +100,11 @@
             // TODO:Сохранение значений.
         }
 
-
+        /// <summary>
+        /// Применить метод обратного распространения для обучения.
+        /// </summary>
+        /// <param name="realScheme">Реальна топология сети.</param>
+        /// <param name="iteration">Итерация.</param>
         private void DoBackpropagation(Dictionary<int, List<Layer>> realScheme, int iteration)
         {
             var outputLayer = realScheme.Last().Value.ToList().FirstOrDefault() as OutputLayer;
@@ -109,7 +114,7 @@
 
             foreach (var outputNeuron in outputLayerNeurons)
             {
-                // Output hidden
+                // Output -> hidden
                 var hiddenLayersDictionary = realScheme
                 .Where(layer => layer.Value.First().Type.Equals(LayerType.Hidden))
                 .ToDictionary(x => x.Key, y => y.Value);
@@ -120,8 +125,7 @@
                 SetDeltasInHiddenLayer(outputNeuron, neurons);
                 UpdateWeightsHiddenToOutut(outputNeuron, neurons);
 
-                // Hidden sub
-
+                // Hidden -> sub
                 var subsamplingLayersDictionary = realScheme
                     .Where(layer => layer.Value.First().Type.Equals(LayerType.Subsampling))
                     .ToDictionary(x => x.Key, y => y.Value);
@@ -144,20 +148,34 @@
                     SetDeltasInSubSamplingLayer(hiddenLayerNeurons, map);
                     UpdateWeightsSubsamplingToHidden(hiddenLayerNeurons, map);
 
+                    _virtualMaxPoolingMatrix.SetDeltaToConvolutionLayer(subsamplingLayer);
                     ++index;
                 }
 
-                subsamplingLayers.ForEach(layer => 
-                    _virtualMaxPoolingMatrix.SetDeltaToConvolutionLayer(layer as SubsamplingLayer));
-
-                // Берём карту из слоёв выше это нейронысо значениями и дельтами
-                // Веса это матрица фильтра на слоях свёртки
-                // Для них дельты не вычисляем
-                // Находим им веса по дельтам из карты 1 пункта и весу (матрица фильтров)
-
+                //sub -> conv
                 var convolutionLayersDictionary = realScheme
                     .Where(layer => layer.Value.First().Type.Equals(LayerType.Convolution))
                     .ToDictionary(x => x.Key, y => y.Value);
+
+                var convolutionLayers = convolutionLayersDictionary.Values.
+                    SelectMany(value => value.Select(layer => layer)).ToList();
+
+                index = 0;
+                foreach (var layer in convolutionLayers)
+                {
+                    var convolutionLayer = layer as ConvolutionLayer;
+                    var subsamplingLayer = subsamplingLayers[index] as SubsamplingLayer;
+
+                    var mapOfDeltas = subsamplingLayer.Map;
+                    var mapOfInputs = convolutionLayer.Map;
+
+                    var filterMatrix = convolutionLayer.FilterMatrix;
+
+                    filterMatrix.Cells.ForEach(cell => 
+                        cell.UpdateCellByIOMaps(mapOfInputs, mapOfDeltas, filterMatrix.Size, _hyperParameters));
+
+                    ++index;
+                }
             }
         }
 

@@ -69,7 +69,7 @@
         public void SetData(List<NeuronFromMap> neurons)
         {
             if (!neurons.Count.Equals(_neurons.Count))
-                throw new Exception("Количество переданных нейронов не соттвествует количеству нейроно на слое!");
+                throw new Exception("Количество переданных нейронов не соттвествует количеству нейронов на слое!");
 
             _neurons = neurons;
         }

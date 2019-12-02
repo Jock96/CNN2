@@ -29,7 +29,7 @@
         /// <summary>
         /// Число с которого начинается выборка для обучения чисел.
         /// </summary>
-        private const int START_NUMBER = 1;
+        private const int START_NUMBER = 0;
 
         /// <summary>
         /// Текущее число.
@@ -71,7 +71,7 @@
             _dataSetForNumbers.Add(_currentNumber, numericData);
             _currentNumber++;
 
-            if (_currentNumber > MAX_ADDED_NUMBERS)
+            if (_currentNumber == MAX_ADDED_NUMBERS)
                 _isFull = true;
         }
 

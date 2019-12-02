@@ -76,6 +76,8 @@
             var epochCount = _hyperParameters.EpochCount;
             var iterationCount = outputs.Count();
 
+            #warning Реализация сделана для дефолтной схемы: вход -> N свёртки -> N пуллинг -> N скрытых -> выход
+
             for (var epoch = 0; epoch < epochCount; ++epoch)
                 for (var iteration = 0; iteration < iterationCount; ++iteration)
                 {
@@ -94,10 +96,96 @@
                             throw new Exception("Неизвестный тип обучения!");
                     }
 
-                    // TODO: Обновление значений.
+                    RewriteInputs(realScheme, iteration, iterationCount, epoch);
                 }
 
+            // TODO:Расчёт ошибки.
+            // TODO:Подбор гиперпараметров.
+            // TODO:Распознавание.
+            // TODO:Создание выборки.
             // TODO:Сохранение значений.
+        }
+
+        /// <summary>
+        /// Записать новые входные значения.
+        /// </summary>
+        /// <param name="realScheme">Топология сети.</param>
+        /// <param name="iteration">Текущая итерация.</param>
+        /// <param name="iterationCount">Количество итераций.</param>
+        /// <param name="epoch">Текущая эпоха.</param>
+        private void RewriteInputs(Dictionary<int, List<Layer>> realScheme, int iteration, int iterationCount, int epoch)
+        {
+            var nextIteration = iteration + 1;
+
+            if (nextIteration == iterationCount)
+                nextIteration = 0;
+
+            var numberOfData = epoch;
+            var countOfSets = _dataSet.GetDataSetForNumber()[nextIteration].Count;
+
+            if (epoch > countOfSets)
+                numberOfData = epoch - countOfSets;
+
+            var data = _dataSet.GetDataSetForNumber()[nextIteration][numberOfData];
+            var inputLayer = realScheme.First().Value.ToList().FirstOrDefault() as InputLayer;
+
+            inputLayer.SetData(data);
+            var inputMap = inputLayer.GetData(LayerReturnType.Map) as FigureMap;
+
+            var nextKey = realScheme.First().Key + 1;
+            var countOfLayers = realScheme[nextKey].Count;
+
+            var lastKey = realScheme.Last().Key;
+            var inputs = new List<double>();
+
+            for (var indexOfLayer = 0; indexOfLayer < countOfLayers; ++indexOfLayer)
+            {
+                var convolutionLayersDictionary = realScheme
+                    .Where(layer => layer.Value.First().Type.Equals(LayerType.Convolution))
+                    .ToDictionary(x => x.Key, y => y.Value);
+
+                var convolutionLayer = convolutionLayersDictionary.Values.
+                    SelectMany(value => value.Select(layer => layer))
+                    .ToList()[indexOfLayer] as ConvolutionLayer;
+
+                convolutionLayer.SetData(inputMap);
+                var nextData = convolutionLayer.GetData(LayerReturnType.Map) as FigureMap;
+
+                var subsamplingLayersDictionary = realScheme
+                    .Where(layer => layer.Value.First().Type.Equals(LayerType.Subsampling))
+                    .ToDictionary(x => x.Key, y => y.Value);
+
+                var subsamplingLayer = subsamplingLayersDictionary.Values.
+                    SelectMany(value => value.Select(layer => layer))
+                    .ToList()[indexOfLayer] as SubsamplingLayer;
+
+                subsamplingLayer.SetData(nextData);
+                var temporaryNeurons = subsamplingLayer.GetData(LayerReturnType.Neurons) as List<NeuronFromMap>;
+
+                var hiddenLayersDictionary = realScheme
+                        .Where(layer => layer.Value.First().Type.Equals(LayerType.Hidden))
+                        .ToDictionary(x => x.Key, y => y.Value);
+
+                var hiddenLayer = hiddenLayersDictionary.Values.
+                    SelectMany(value => value.Select(layer => layer))
+                    .ToList()[indexOfLayer] as HiddenLayer;
+
+                var hiddenLayerNeurons = hiddenLayer.GetData(LayerReturnType.Neurons) as List<NeuronFromMap>;
+
+                for (var indexOfNeuron = 0; indexOfNeuron < hiddenLayerNeurons.Count; ++indexOfNeuron)
+                {
+                    var temporaryNeuron = temporaryNeurons[indexOfNeuron];
+                    var realNeuron = hiddenLayerNeurons[indexOfNeuron];
+
+                    for (var indexOfInput = 0; indexOfInput < realNeuron.Inputs.Count; ++indexOfInput)
+                        realNeuron.Inputs[indexOfInput] = temporaryNeuron.Inputs[indexOfInput];
+                }
+
+                hiddenLayerNeurons.ForEach(neuron => inputs.Add(neuron.Output));
+            }
+
+            var outputLayer = realScheme.Last().Value.ToList().FirstOrDefault() as OutputLayer;
+            outputLayer.SetData(inputs);
         }
 
         /// <summary>

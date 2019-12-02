@@ -28,7 +28,7 @@
         /// <summary>
         /// Значение.
         /// </summary>
-        public double Value { get; protected set; }
+        public double Value { get; set; }
 
         /// <summary>
         /// Ячейка.

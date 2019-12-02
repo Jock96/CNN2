@@ -107,12 +107,5 @@
 
             Map = map;
         }
-
-        /// <summary>
-        /// Обновление фильтра.
-        /// </summary>
-        /// <param name="cells">Новые ячейки.</param>
-        public void UpdateFilterCore(List<Cell> cells)
-            => FilterMatrix.UpdateFilterMatrix(cells);
     }
 }

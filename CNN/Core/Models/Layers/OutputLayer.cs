@@ -58,16 +58,13 @@
         /// <summary>
         /// Записать значения на слоя.
         /// </summary>
-        /// <param name="neurons">Нейроны.</param>
-        public void SetData(List<Neuron> neurons)
+        /// <param name="inputs">Входные значения.</param>
+        public void SetData(List<double> inputs)
         {
             if (!_isInitialized)
                 throw new Exception("Перед внесением данных в слой необходимо его проинициализировать!");
 
-            if (!neurons.Count.Equals(_layerNeurons.Count))
-                throw new Exception("Количество переданных нейронов не соттвествует количеству нейроно на слое!");
-
-            _layerNeurons = neurons;
+            _layerNeurons.ForEach(neuron => neuron.Inputs = inputs);
         }
 
         /// <summary>

@@ -111,7 +111,13 @@
             if (!map.Cells.Count.Equals(Map.Cells.Count))
                 throw new Exception("Размерность карты значений не совпадает!");
 
-            Map = map;
+            foreach (var cell in Map.Cells)
+            {
+                var newValue = map.Cells
+                    .Find(inputCell => inputCell.X.Equals(cell.X) && inputCell.Y.Equals(cell.Y)).Value;
+
+                cell.Value = newValue;
+            }
         }
     }
 }

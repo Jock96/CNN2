@@ -57,7 +57,10 @@
                 /**/
 
                 var trainUtil = new TrainUtil(dataSet, TrainType.Backpropagation, hyperParameters, topology);
-                trainUtil.Start(3, 2);
+                trainUtil.Start(3, 2, out var error);
+
+                var errorString = $"{Math.Round(error * 100, 2)}%";
+                Console.WriteLine($"Ошибка: {errorString}");
             }
             catch (Exception exception)
             {

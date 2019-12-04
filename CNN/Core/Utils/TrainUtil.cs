@@ -67,9 +67,13 @@
         /// </summary>
         /// <param name="filterMatrixSize">Размер матриц фильтра.</param>
         /// <param name="poolingMatrixSize">Размер пуллинговых матриц.</param>
+        /// <param name="error">Ошибка сети.</param>
         /// <param name="isNeedSave">Необходимо ли сохранять оубченную сеть.</param>
-        public void Start(int filterMatrixSize, int poolingMatrixSize, bool isNeedSave = true)
+        public void Start(int filterMatrixSize, int poolingMatrixSize, out double error, bool isNeedSave = true)
         {
+            error = 0d;
+            var errorSummary = 0d;
+
             var realScheme = InitializeRealScheme(filterMatrixSize, poolingMatrixSize);
             var outputs = realScheme.Last().Value.First().GetData(LayerReturnType.Neurons) as Dictionary<int, Neuron>;
 
@@ -79,6 +83,9 @@
             #warning Реализация сделана для дефолтной схемы: вход -> N свёртки -> N пуллинг -> N скрытых -> выход
 
             for (var epoch = 0; epoch < epochCount; ++epoch)
+            {
+                var summaryOnEpoch = 0d;
+
                 for (var iteration = 0; iteration < iterationCount; ++iteration)
                 {
                     var currentOutput = outputs[iteration].Output;
@@ -96,14 +103,22 @@
                             throw new Exception("Неизвестный тип обучения!");
                     }
 
+                    summaryOnEpoch += Math.Pow(_hyperParameters.IdealResult - currentOutput, 2);
+
                     RewriteInputs(realScheme, iteration, iterationCount, epoch);
                 }
 
-            // TODO:Расчёт ошибки.
+                errorSummary += summaryOnEpoch / iterationCount;
+            }
+
+            error = errorSummary / epochCount;
+
+            if (isNeedSave)
+                IOUtil.Save(realScheme);
+
             // TODO:Подбор гиперпараметров.
             // TODO:Распознавание.
             // TODO:Создание выборки.
-            // TODO:Сохранение значений.
         }
 
         /// <summary>

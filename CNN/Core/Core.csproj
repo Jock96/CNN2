@@ -70,6 +70,7 @@
     <Compile Include="Models\VirtualMaxPoolingMatrix.cs" />
     <Compile Include="Models\WeightToMapPosition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\IOUtil.cs" />
     <Compile Include="Utils\MathUtil.cs" />
     <Compile Include="Utils\NormilizeUtil.cs" />
     <Compile Include="Utils\TrainUtil.cs" />

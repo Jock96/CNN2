@@ -73,6 +73,7 @@
     <Compile Include="Utils\IOUtil.cs" />
     <Compile Include="Utils\MathUtil.cs" />
     <Compile Include="Utils\NormilizeUtil.cs" />
+    <Compile Include="Utils\RecognizeUtil.cs" />
     <Compile Include="Utils\TrainUtil.cs" />
   </ItemGroup>
   <ItemGroup>

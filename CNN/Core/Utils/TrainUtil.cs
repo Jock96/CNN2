@@ -68,10 +68,13 @@
         /// <param name="filterMatrixSize">Размер матриц фильтра.</param>
         /// <param name="poolingMatrixSize">Размер пуллинговых матриц.</param>
         /// <param name="error">Ошибка сети.</param>
+        /// <param name="pathToSave">Путь до сохраненого файла.</param>
         /// <param name="isNeedSave">Необходимо ли сохранять оубченную сеть.</param>
-        public void Start(int filterMatrixSize, int poolingMatrixSize, out double error, bool isNeedSave = true)
+        public void Start(int filterMatrixSize, int poolingMatrixSize, out double error, out string pathToSave, bool isNeedSave = true)
         {
+            pathToSave = string.Empty;
             error = 0d;
+
             var errorSummary = 0d;
 
             var realScheme = InitializeRealScheme(filterMatrixSize, poolingMatrixSize);
@@ -114,7 +117,7 @@
             error = errorSummary / epochCount;
 
             if (isNeedSave)
-                IOUtil.Save(realScheme);
+                IOUtil.Save(realScheme, out pathToSave);
 
             // TODO:Подбор гиперпараметров.
             // TODO:Распознавание.

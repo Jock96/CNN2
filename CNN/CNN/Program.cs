@@ -57,16 +57,32 @@
                 /**/
 
                 var trainUtil = new TrainUtil(dataSet, TrainType.Backpropagation, hyperParameters, topology);
-                trainUtil.Start(3, 2, out var error);
+                trainUtil.Start(3, 2, out var error, out var pathToSave);
 
                 var errorString = $"{Math.Round(error * 100, 2)}%";
+
                 Console.WriteLine($"Ошибка: {errorString}");
+                Console.WriteLine($"Путь к настройкам: {pathToSave}");
+
+                var recognizeUtil = new RecognizeUtil(pathToSave);
+
+                // Для отладки
+                /**/
+
+                var data = normilizedMatrixies.First();
+
+                /**/
+
+                recognizeUtil.ToRecognizeData(data);
+
             }
             catch (Exception exception)
             {
                 Console.BackgroundColor = ConsoleColor.Red;
                 Console.ForegroundColor = ConsoleColor.Black;
+
                 Console.WriteLine(exception.Message);
+
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.BackgroundColor = ConsoleColor.Black;
             }

@@ -118,10 +118,6 @@
 
             if (isNeedSave)
                 IOUtil.Save(realScheme, out pathToSave);
-
-            // TODO:Подбор гиперпараметров.
-            // TODO:Распознавание.
-            // TODO:Создание выборки.
         }
 
         /// <summary>

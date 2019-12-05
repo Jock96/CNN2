@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\IOConstants.cs" />
+    <Compile Include="Constants\RandomConstants.cs" />
     <Compile Include="Enums\ActivationFunctionType.cs" />
     <Compile Include="Enums\DataSetType.cs" />
     <Compile Include="Enums\LayerReturnType.cs" />

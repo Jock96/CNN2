@@ -7,6 +7,7 @@
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using Core.Constants;
 
     /// <summary>
     /// Матрица фильтра.
@@ -77,7 +78,10 @@
                 for (var x = 0; x < Size; ++x)
                     for (var y = 0; y < Size; ++y)
                     {
-                        var value = new Random().NextDouble(0.00001, 0.2);
+                        var value = new Random().NextDouble(
+                            RandomConstants.NEURON_WEIGHT_START_MIN_VALUE,
+                            RandomConstants.NEURON_WEIGHT_START_MAX_VALUE);
+
                         System.Threading.Thread.Sleep(20);
                         Cells.Add(new ModifiedCell(x, y, value));
                     }

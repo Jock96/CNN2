@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-
+    using Core.Constants;
     using Core.Enums;
     using Core.Extensions;
 
@@ -147,7 +147,10 @@
                 foreach (var input in _inputs)
                 {
                     lastWeights.Add(0);
-                    var value = new Random().NextDouble(0.0001, 0.2);
+                    var value = new Random().NextDouble(
+                        RandomConstants.NEURON_WEIGHT_START_MIN_VALUE,
+                        RandomConstants.NEURON_WEIGHT_START_MAX_VALUE);
+
                     System.Threading.Thread.Sleep(20);
                     weights.Add(value);
                 }

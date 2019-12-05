@@ -57,22 +57,12 @@
                         ConsoleColor.Black, $"\n{exception.Message}");
                 }
             }
-
-                var pathToSave = "";
-
-                var recognizeUtil = new RecognizeUtil(pathToSave);
-
-                // Для отладки
-                /**/
-
-                dynamic data = null;
-
-                /**/
-
-                var answer = recognizeUtil.ToRecognizeData(data);
-                Console.WriteLine(answer);
         }
 
+        /// <summary>
+        /// Распознавание.
+        /// </summary>
+        /// <param name="pathToSettings">Путь к файлу настроек.</param>
         private static void DoRecognize(string pathToSettings)
         {
             Console.Clear();
@@ -110,6 +100,14 @@
                     "\nВведите путь до файла с изображением, чтобы распознать его:");
 
                 var pathToImage = Console.ReadLine();
+
+                // Для отладки.
+                /**/
+
+                if (pathToImage.Equals("default"))
+                    pathToImage = @"C:\Лабы\Учёба (3 семестр)\CNN2\CNN\BL\Resources\0\0(0).bmp";
+
+                /**/
 
                 if (!File.Exists(pathToImage))
                     throw new Exception($"Не удалось найти файл по указанному пути!\nДиректория: {pathToImage}");
@@ -170,7 +168,13 @@
                 ++key;
             }
 
-            var hyperParameters = new HyperParameters();
+            var hyperParameters = new HyperParameters
+            {
+                EpochCount = 1,
+                Epsilon = 0.75,
+                Alpha = 0.001
+            };
+
             var topology = new Topology();
 
             topology.Add(2, 2, LayerType.Convolution);

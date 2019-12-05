@@ -56,6 +56,23 @@
         }
 
         /// <summary>
+        /// Конструктор выходного слоя для распознавания чисел.
+        /// </summary>
+        /// <param name="neurons">Нейроны.</param>
+        /// <param name="modeType">Тип мода сети.</param>
+        /// <param name="type">Тип распознавания.</param>
+        public OutputLayer(List<Neuron> neurons, NetworkModeType modeType,
+            OutputLayerType type = OutputLayerType.NumberRecognizing)
+        {
+            if (!type.Equals(OutputLayerType.NumberRecognizing) &&
+                !modeType.Equals(NetworkModeType.Recognizing))
+                throw new Exception("Данный конструкто предназначен только для распознавания чисел.");
+
+            _type = type;
+            _layerNeurons = neurons;
+        }
+
+        /// <summary>
         /// Записать значения на слоя.
         /// </summary>
         /// <param name="inputs">Входные значения.</param>
@@ -107,8 +124,8 @@
                     break;
 
                 case NetworkModeType.Recognizing:
-                    //TODO: Доделать.
-                    throw new NotImplementedException();
+                    _isInitialized = true;
+                    return;
 
                 default:
                     throw new Exception("Неизвестный тип мода нейронной сети.");

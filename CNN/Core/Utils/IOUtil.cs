@@ -307,8 +307,189 @@
         /// <returns>Возвращает сеть с данными.</returns>
         public static Dictionary<int, List<Layer>> LoadAndInitialize(string path, double[,] inputData)
         {
-            var document = new XDocument(path);
+            var document = XDocument.Load(path);
+            var realTopology = new Dictionary<int, List<Layer>>();
 
+            var baseElement = document.Elements().ToList()
+                .Find(element => string.Equals(
+                    element.Name.LocalName,
+                    IOConstants.NETWORK_BASE_ELEMENT_NAME,
+                    StringComparison.InvariantCultureIgnoreCase));
+
+            var inputDataSize = baseElement.Elements().ToList()
+                .Find(element => string.Equals(
+                    element.Name.LocalName,
+                    IOConstants.INPUT_DATA_SIZE_ELEMENT_NAME,
+                    StringComparison.InvariantCultureIgnoreCase)).Value;
+
+            var size = int.Parse(inputDataSize);
+
+            var xSize = inputData.GetLength(0);
+            var ySize = inputData.GetLength(1);
+
+            if (!xSize.Equals(size) || !ySize.Equals(size))
+                throw new Exception($"Размер входных данных не соотвествует ожидаемому размеру {size}!");
+
+            var inputLayer = new InputLayer(inputData);
+            inputLayer.Initialize(Enums.NetworkModeType.Recognizing);
+
+            var currentNumber = Topology.FIRST_NUMBER;
+            realTopology.Add(currentNumber, new List<Layer> { inputLayer });
+
+            var layers = baseElement.Elements().ToList()
+                .FindAll(element => string.Equals(
+                    element.Name.LocalName,
+                    IOConstants.LAYERS_ELEMENT_NAME,
+                    StringComparison.InvariantCultureIgnoreCase));
+
+            var layersCount = layers.Count;
+            var layersCountWithoutOutput = layersCount - 1;
+
+            var previousKey = realTopology.First().Key;
+            foreach (var layer in layers)
+            {
+                var layerElements = layer.Elements().ToList();
+                var name = layerElements.First().Name.LocalName;
+
+                if (string.Equals(name, IOConstants.CONVOLUTION_LAYER_ELEMENT_NAME,
+                    StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var previousElementsCount = realTopology[previousKey].Count;
+                    dynamic inputToLayer;
+
+                    if (!previousElementsCount.Equals(1))
+                        throw new NotImplementedException();
+
+                    inputToLayer = realTopology[previousKey].First()
+                        .GetData(Enums.LayerReturnType.Map) as FigureMap;
+
+                    var layersInTopology = new List<Layer>();
+
+                    foreach (var element in layerElements)
+                    {
+                        var filterMatrixElement = element
+                            .Elements().ToList().First();
+
+                        var filterMatrixSize = int.Parse(filterMatrixElement
+                            .Attribute(IOConstants.SIZE_ATTRIBUTE_NAME)
+                            .Value);
+
+                        var cells = new List<ModifiedCell>();
+
+                        foreach (var cellElement in filterMatrixElement.Elements())
+                        {
+                            var x = int.Parse(cellElement.Attribute(IOConstants.X_ATTRIBUTE_NAME).Value);
+                            var y = int.Parse(cellElement.Attribute(IOConstants.Y_ATTRIBUTE_NAME).Value);
+                            var value = double.Parse(cellElement.Value.Replace(".", ","));
+
+                            cells.Add(new ModifiedCell(x, y, value));
+                        }
+
+                        var filterMatrix = new FilterMatrix(filterMatrixSize,
+                            Enums.NetworkModeType.Recognizing, cells);
+
+                        var convolutionLayer = new ConvolutionLayer(inputToLayer,
+                            filterMatrix, Enums.NetworkModeType.Recognizing);
+
+                        layersInTopology.Add(convolutionLayer);
+                    }
+
+                    realTopology.Add(previousKey + 1, layersInTopology);
+                    ++previousKey;
+                }
+
+                if (string.Equals(name, IOConstants.SUBSAMPLING_LAYER_ELEMENT_NAME,
+                    StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var previousElements = realTopology[previousKey];
+                    var layersInTopology = new List<Layer>();
+
+                    var indexOfElementInPreviousPart = 0;
+                    foreach (var element in layerElements)
+                    {
+                        var inputDataInLayer = previousElements[indexOfElementInPreviousPart]
+                            .GetData(Enums.LayerReturnType.Map) as FigureMap;
+
+                        var poolingMatrixSize = int.Parse(element.Elements()
+                            .ToList().First().Attribute(IOConstants.SIZE_ATTRIBUTE_NAME).Value);
+
+                        var subsamplingLayer = new SubsamplingLayer(inputDataInLayer, poolingMatrixSize);
+                        subsamplingLayer.Initialize(Enums.NetworkModeType.Recognizing);
+
+                        layersInTopology.Add(subsamplingLayer);
+                        ++indexOfElementInPreviousPart;
+                    }
+
+                    realTopology.Add(previousKey + 1, layersInTopology);
+                    ++previousKey;
+                }
+
+                if (string.Equals(name, IOConstants.HIDDEN_LAYER_ELEMENT_NAME,
+                    StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var previousElements = realTopology[previousKey];
+                    var layersInTopology = new List<Layer>();
+
+                    var indexOfElementInPreviousPart = 0;
+                    foreach (var element in layerElements)
+                    {
+                        var temporaryNeurons = previousElements[indexOfElementInPreviousPart]
+                            .GetData(Enums.LayerReturnType.Neurons) as List<NeuronFromMap>;
+
+                        var realNeurons = new List<NeuronFromMap>();
+
+                        var index = 0;
+                        foreach (var neuronElement in element.Elements().First().Elements())
+                        {
+                            var weights = new List<double>();
+
+                            foreach (var weightElement in neuronElement.Elements())
+                                weights.Add(double.Parse(weightElement.Value.Replace(".", ",")));
+
+                            var inputs = temporaryNeurons[index].Inputs;
+                            var neuron = new NeuronFromMap(inputs, weights);
+
+                            realNeurons.Add(neuron);
+                            ++index;
+                        }
+
+                        var hiddenLayer = new HiddenLayer(realNeurons);
+                        layersInTopology.Add(hiddenLayer);
+
+                        ++indexOfElementInPreviousPart;
+                    }
+
+                    realTopology.Add(previousKey + 1, layersInTopology);
+                    ++previousKey;
+                }
+            }
+
+            var inputValues = new List<double>();
+
+            foreach(HiddenLayer hiddenLayer in realTopology.Last().Value)
+                inputValues.AddRange((hiddenLayer.GetData(Enums.LayerReturnType.Neurons) 
+                    as List<NeuronFromMap>).Select(neuron => neuron.Output));
+
+            var neurons = new List<Neuron>();
+            var neuronsElement = layers.Last().Elements().First().Elements().First().Elements();
+
+            foreach (var outputNeuron in neuronsElement)
+            {
+                var weights = outputNeuron.Elements()
+                    .Select(weight => double.Parse(weight.Value.Replace(".", ","))).ToList();
+
+                neurons.Add(new Neuron(inputValues, weights));
+            }
+
+            var outputLayer = new OutputLayer(neurons,
+                Enums.NetworkModeType.Recognizing, Enums.OutputLayerType.NumberRecognizing);
+
+            outputLayer.Initialize(Enums.NetworkModeType.Recognizing);
+
+            var lastKey = realTopology.Last().Key;
+            realTopology.Add(lastKey + 1, new List<Layer> { outputLayer });
+
+            return realTopology;
         }
     }
 }

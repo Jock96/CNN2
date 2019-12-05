@@ -47,6 +47,22 @@
         }
 
         /// <summary>
+        /// Свёрточный слой.
+        /// </summary>
+        /// <param name="map">Карта значений.</param>
+        /// <param name="filterMatrix">Матрица фильтра.</param>
+        /// <param name="modeType">Тип мода ети (для обучения выдаёт исключение).</param>
+        public ConvolutionLayer(FigureMap map, FilterMatrix filterMatrix, NetworkModeType modeType)
+        {
+            if (!modeType.Equals(NetworkModeType.Recognizing))
+                throw new Exception("Данный конструктор не может использоваться для обучения!");
+
+            Map = map;
+            FilterMatrix = filterMatrix;
+            _isInitialized = true;
+        }
+
+        /// <summary>
         /// Инициализация.
         /// </summary>
         /// <param name="type">Тип мода нейронной сети.</param>

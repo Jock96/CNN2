@@ -54,15 +54,8 @@
             if (_isInitialized)
                 throw new Exception("Невозможно инициализировать уже инициализированную модель!");
 
-            if (type.Equals(NetworkModeType.Learning))
-            {
-                PoolingMatrix = new PoolingMatrix(_poolingMatrixSize);
-            }
-            else
-            {
-                //TODO: Реализовать.
-                throw new NotImplementedException();
-            }
+            // Независимо от типа мода сети инициализация проходит одинаково.
+            PoolingMatrix = new PoolingMatrix(_poolingMatrixSize);
 
             _isInitialized = true;
         }

@@ -39,8 +39,29 @@
         /// <param name="size">Размер.</param>
         public FilterMatrix(int size, NetworkModeType type)
         {
+            if (!type.Equals(NetworkModeType.Learning))
+                throw new Exception("Данный конструктор может использоваться только для обучения.");
+
             Size = size;
             _type = type;
+        }
+
+        /// <summary>
+        /// Матрица фильтра.
+        /// </summary>
+        /// <param name="size">Размер.</param>
+        /// <param name="type">Тип мода сети.</param>
+        /// <param name="cells">Ячейки.</param>
+        public FilterMatrix(int size, NetworkModeType type, List<ModifiedCell> cells)
+        {
+            if (!type.Equals(NetworkModeType.Recognizing))
+                throw new Exception("Данный конструктор может использоваться только для распознавания.");
+
+            Cells = cells;
+            Size = size;
+            _type = type;
+
+            _isInitialized = true;
         }
 
         /// <summary>

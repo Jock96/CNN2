@@ -18,7 +18,7 @@
         /// <summary>
         /// Первое число.
         /// </summary>
-        private const int FIRST_NUMBER = 1;
+        internal const int FIRST_NUMBER = 1;
 
         /// <summary>
         /// Последнее число.

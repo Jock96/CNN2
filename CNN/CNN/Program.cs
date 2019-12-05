@@ -73,8 +73,8 @@
 
                 /**/
 
-                recognizeUtil.ToRecognizeData(data);
-
+                var answer = recognizeUtil.ToRecognizeData(data);
+                Console.WriteLine(answer);
             }
             catch (Exception exception)
             {

@@ -34,8 +34,17 @@
         /// </summary>
         public new double Output
         {
-            get => ActivationFunction(Inputs,
-                WeightsToMapPosition.Select(weight => weight.Value).ToList());
+            get
+            {
+                var output = 0d;
+
+                if (WeightsToMapPosition != null && WeightsToMapPosition.Any())
+                    output = ActivationFunction(Inputs, WeightsToMapPosition.Select(weight => weight.Value).ToList());
+                else
+                    output = ActivationFunction(Inputs, Weights);
+
+                return output;
+            }
         }
     }
 }

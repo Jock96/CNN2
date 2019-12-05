@@ -82,13 +82,7 @@
         {
             // Данный слой инициализируется автоматически,
             // при передаче ему нейронов с предыдущего слоя.
-            if (type.Equals(NetworkModeType.Learning))
                 return;
-            else
-            {
-                //TODO: Реализовать.
-                throw new NotImplementedException();
-            }
         }
     }
 }

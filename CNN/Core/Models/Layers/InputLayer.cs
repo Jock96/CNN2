@@ -47,15 +47,10 @@
             if (_isInitialized)
                 throw new Exception("Невозможно инициализировать уже инициализированную модель!");
 
-            var size = GetDataSize();
+            // Независимо от типа мода нейронной сети возвращается карта.
 
-            if (type.Equals(NetworkModeType.Learning))
-                _layerData = new FigureMap(size, _data);
-            else
-            {
-                //TODO: Реализовать.
-                throw new NotImplementedException();
-            }
+            var size = GetDataSize();
+            _layerData = new FigureMap(size, _data);
 
             _isInitialized = true;
         }
